@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux Career Readiness Quiz — WirfonCloud Academy</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px}
+  .container{width:100%;max-width:640px}
+
+  /* Header */
+  .quiz-header{background:#0199EF;border-radius:16px;padding:28px 28px 22px;color:#fff;margin-bottom:16px}
+  .quiz-header h1{font-size:22px;font-weight:700;margin-bottom:6px}
+  .quiz-header p{font-size:14px;opacity:.88;margin-bottom:14px}
+  .progress-track{background:rgba(255,255,255,.3);border-radius:10px;height:5px}
+  .progress-fill{height:5px;border-radius:10px;background:#fff;transition:width .4s ease}
+  .progress-label{display:flex;justify-content:space-between;font-size:12px;opacity:.75;margin-top:7px}
+
+  /* Question card */
+  .q-card{background:#fff;border-radius:16px;padding:24px 26px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+  .q-number{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#0199EF;margin-bottom:10px}
+  .q-text{font-size:16px;font-weight:600;color:#111;line-height:1.5;margin-bottom:18px}
+
+  /* Options */
+  .option{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;border:1.5px solid #e2e8f0;margin-bottom:9px;cursor:pointer;transition:all .15s;background:#fff}
+  .option:hover{border-color:#0199EF;background:#f0f9ff}
+  .option.selected{border-color:#0199EF;background:#e6f5ff}
+  .option.correct{border-color:#16a34a;background:#f0fdf4}
+  .option.wrong{border-color:#dc2626;background:#fef2f2}
+  .opt-bubble{width:32px;height:32px;border-radius:50%;border:1.5px solid #cbd5e1;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#64748b;flex-shrink:0;transition:all .15s;background:#fff}
+  .option.selected .opt-bubble{background:#0199EF;border-color:#0199EF;color:#fff}
+  .option.correct .opt-bubble{background:#16a34a;border-color:#16a34a;color:#fff}
+  .option.wrong .opt-bubble{background:#dc2626;border-color:#dc2626;color:#fff}
+  .opt-text{font-size:14px;color:#374151;line-height:1.45}
+
+  /* Explanation */
+  .explanation{background:#eff6ff;border-left:3px solid #0199EF;border-radius:0 8px 8px 0;padding:10px 14px;font-size:13px;color:#1e40af;line-height:1.6;margin-top:12px;display:none}
+
+  /* Nav */
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+  .btn{padding:10px 22px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;transition:all .15s}
+  .btn:hover:not(:disabled){background:#f8fafc;border-color:#cbd5e1}
+  .btn:disabled{opacity:.35;cursor:not-allowed}
+  .btn-primary{background:#0199EF;border-color:#0199EF;color:#fff}
+  .btn-primary:hover:not(:disabled){background:#0187d4;border-color:#0187d4}
+  .q-counter{font-size:13px;color:#94a3b8;font-weight:500}
+
+  /* Email capture */
+  .email-card{background:#fff;border-radius:16px;padding:28px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+  .email-card h2{font-size:20px;font-weight:700;color:#111;margin-bottom:8px}
+  .email-card p{font-size:14px;color:#64748b;line-height:1.6;margin-bottom:22px}
+  .form-group{margin-bottom:14px}
+  .form-group label{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px}
+  .form-group input,
+  .form-group select{width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid #e2e8f0;font-size:14px;color:#111;outline:none;transition:border .15s;background:#fff}
+  .form-group input:focus,
+  .form-group select:focus{border-color:#0199EF}
+  .submit-btn{width:100%;padding:13px;background:#0199EF;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:background .15s;margin-top:6px}
+  .submit-btn:hover{background:#0187d4}
+  .privacy-note{font-size:11px;color:#94a3b8;text-align:center;margin-top:10px}
+
+  /* Results */
+  .results-card{background:#fff;border-radius:16px;padding:28px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+  .score-circle{width:110px;height:110px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 18px;border:4px solid #0199EF}
+  .score-big{font-size:38px;font-weight:800;color:#0199EF;line-height:1}
+  .score-denom{font-size:14px;color:#94a3b8;font-weight:500}
+  .tier-badge{display:inline-block;padding:5px 16px;border-radius:20px;font-size:13px;font-weight:700;margin-bottom:14px}
+  .tier-starter{background:#dbeafe;color:#1d4ed8}
+  .tier-building{background:#dbeafe;color:#1d4ed8}
+  .tier-aware{background:#dcfce7;color:#15803d}
+  .tier-ready{background:#dcfce7;color:#15803d}
+  .result-heading{font-size:20px;font-weight:700;color:#111;margin-bottom:10px;text-align:center}
+  .result-text{font-size:14px;color:#374151;line-height:1.7;margin-bottom:16px}
+  .student-proof{background:#f0f9ff;border-radius:10px;padding:14px 16px;margin:14px 0}
+  .student-proof p{font-size:13px;color:#374151;line-height:1.6;margin-bottom:8px}
+  .student-proof a{color:#0199EF;font-weight:600;font-size:13px;text-decoration:none}
+  .student-proof a:hover{text-decoration:underline}
+
+  /* CTA box */
+  .cta-box{background:#0199EF;border-radius:14px;padding:22px 24px;text-align:center;margin-top:4px}
+  .cta-box h3{font-size:18px;font-weight:700;color:#fff;margin-bottom:8px}
+  .cta-box p{font-size:13px;color:rgba(255,255,255,.88);line-height:1.6;margin-bottom:16px}
+  .cta-link{display:inline-block;background:#fff;color:#0199EF;font-weight:700;font-size:14px;padding:11px 26px;border-radius:10px;text-decoration:none;transition:opacity .15s}
+  .cta-link:hover{opacity:.9}
+  .cta-free{font-size:11px;color:rgba(255,255,255,.7);margin-top:10px}
+
+  /* Review */
+  .review-section{background:#fff;border-radius:16px;padding:24px 26px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:14px}
+  .review-section h3{font-size:16px;font-weight:700;color:#111;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9}
+  .review-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9}
+  .review-item:last-child{border-bottom:none}
+  .review-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:2px}
+  .ri-correct{background:#dcfce7;color:#15803d}
+  .ri-wrong{background:#fee2e2;color:#dc2626}
+  .review-body{flex:1}
+  .rv-q{font-size:13px;font-weight:600;color:#111;margin-bottom:3px}
+  .rv-your{font-size:12px;color:#64748b;margin-bottom:2px}
+  .rv-correct{font-size:12px;color:#15803d;font-weight:600;margin-bottom:3px}
+  .rv-exp{font-size:12px;color:#64748b;line-height:1.5}
+  .restart-btn{width:100%;padding:12px;background:#f8fafc;color:#64748b;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;margin-top:6px}
+  .restart-btn:hover{background:#f1f5f9}
+
+  /* Sections */
+  .section{display:none}
+  .section.active{display:block}
+
+  /* Intro */
+  .intro-card{background:#fff;border-radius:16px;padding:28px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+  .intro-card h2{font-size:22px;font-weight:700;color:#111;margin-bottom:10px}
+  .intro-card p{font-size:14px;color:#64748b;line-height:1.7;margin-bottom:14px}
+  .intro-list{list-style:none;margin-bottom:22px}
+  .intro-list li{font-size:14px;color:#374151;padding:7px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:8px}
+  .intro-list li:last-child{border-bottom:none}
+  .intro-list li::before{content:'→';color:#0199EF;font-weight:700;flex-shrink:0}
+  .start-btn{width:100%;padding:14px;background:#0199EF;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;transition:background .15s}
+  .start-btn:hover{background:#0187d4}
+  .brand-footer{text-align:center;margin-top:20px;font-size:12px;color:#94a3b8}
+  .brand-footer a{color:#0199EF;text-decoration:none;font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header (always visible during quiz) -->
+  <div class="quiz-header" id="main-header">
+    <h1>Linux Career Readiness Quiz</h1>
+    <p>WirfonCloud Academy · Find your starting point in IT and Cloud</p>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+    <div class="progress-label">
+      <span id="progress-text">Ready to start</span>
+      <span id="score-live" style="display:none">Score: <span id="live-score">0</span>/10</span>
+    </div>
+  </div>
+
+  <!-- SECTION: Intro -->
+  <div class="section active" id="section-intro">
+    <div class="intro-card">
+      <h2>How ready are you for a Linux and Cloud career?</h2>
+      <p>This quiz helps you find your exact starting point — whether you are a complete beginner or already have some Linux knowledge. 10 questions, 5 minutes, no experience needed to try it.</p>
+      <ul class="intro-list">
+        <li>10 multiple choice questions</li>
+        <li>Takes about 5 minutes</li>
+        <li>Get a personalised score and next step</li>
+        <li>Based on the WirfonCloud Academy Foundation First curriculum</li>
+        <li>Free — no login required</li>
+      </ul>
+      <button class="start-btn" onclick="startQuiz()">Start the quiz →</button>
+    </div>
+    <div class="brand-footer">
+      WirfonCloud Academy · <a href="https://academy.wirfoncloud.com" target="_blank">academy.wirfoncloud.com</a> · est. 2020
+    </div>
+  </div>
+
+  <!-- SECTION: Questions -->
+  <div class="section" id="section-quiz">
+    <div id="question-display"></div>
+    <div class="nav-row">
+      <button class="btn" id="btn-prev" onclick="prevQuestion()" disabled>← Back</button>
+      <span class="q-counter" id="q-counter">1 / 10</span>
+      <button class="btn btn-primary" id="btn-next" onclick="nextQuestion()">Next →</button>
+    </div>
+  </div>
+
+  <!-- SECTION: Email capture -->
+  <div class="section" id="section-email">
+    <div class="email-card">
+      <h2>Almost there — see your results</h2>
+      <p>Enter your name and email to receive your personalised Linux Career Readiness score and recommended next step. Your results go to your inbox too.</p>
+      <div class="form-group">
+        <label for="input-name">First name</label>
+        <input type="text" id="input-name" placeholder="Your first name" autocomplete="given-name">
+      </div>
+      <div class="form-group">
+        <label for="input-email">Email address</label>
+        <input type="email" id="input-email" placeholder="your@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="input-country">Country (optional)</label>
+        <select id="input-country">
+          <option value="">Select your country</option>
+          <option>Rwanda</option>
+          <option>Nigeria</option>
+          <option>Ghana</option>
+          <option>Kenya</option>
+          <option>Cameroon</option>
+          <option>Uganda</option>
+          <option>UK / Europe</option>
+          <option>Canada</option>
+          <option>USA</option>
+          <option>Other — Africa</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <button class="submit-btn" onclick="showResults()">Show me my results →</button>
+      <p class="privacy-note">No spam. Unsubscribe any time. WirfonCloud Academy respects your privacy.</p>
+    </div>
+  </div>
+
+  <!-- SECTION: Results -->
+  <div class="section" id="section-results">
+    <div class="results-card" id="results-header-card">
+      <!-- filled by JS -->
+    </div>
+    <div id="cta-block">
+      <!-- filled by JS -->
+    </div>
+    <div class="review-section">
+      <h3>Full question review</h3>
+      <div id="review-list"></div>
+    </div>
+    <button class="restart-btn" onclick="restartQuiz()">↩ Retake the quiz</button>
+    <div class="brand-footer" style="margin-top:16px">
+      WirfonCloud Academy · <a href="https://academy.wirfoncloud.com" target="_blank">academy.wirfoncloud.com</a> · est. 2020
+    </div>
+  </div>
+
+</div>
+
+<script>
+const questions=[
+  {
+    q:"What is Linux?",
+    opts:["A programming language used to build websites","An operating system used on most servers, cloud platforms and mobile devices","A type of cloud service provided by Amazon Web Services","A database management system"],
+    correct:1,
+    exp:"Linux is an operating system — the software that manages hardware and runs applications. It powers over 90% of the world's servers including every major cloud platform."
+  },
+  {
+    q:"You are given access to a remote server. Which tool do you use to connect to it securely?",
+    opts:["FTP — File Transfer Protocol","Telnet","SSH — Secure Shell","Remote Desktop Protocol"],
+    correct:2,
+    exp:"SSH is the standard secure way to connect to a remote Linux server. It encrypts the connection. Telnet is insecure and outdated. FTP is for file transfer only. RDP is Windows-specific."
+  },
+  {
+    q:"In Linux, which command shows you the files and folders in your current directory?",
+    opts:["show","dir","ls","find"],
+    correct:2,
+    exp:"ls lists the contents of your current directory. It is one of the most used Linux commands. dir works on Windows. find searches for files by criteria."
+  },
+  {
+    q:"What does the root directory mean in Linux?",
+    opts:["The home folder of the root user","The top-level directory — the starting point of the entire file system","A hidden folder containing system files","The folder where applications are installed"],
+    correct:1,
+    exp:"In Linux the root directory is / — the top of the entire file system tree. Everything lives inside it. Think of it as the entrance to the whole market compound — every stall, every corridor, every room is inside it."
+  },
+  {
+    q:"Which of the following correctly describes Linux file permissions?",
+    opts:["Linux files have three permission types: view, edit and share","Permissions are set by the file name extension like .exe or .txt","Each file has permissions for owner, group and others — each can read, write or execute","Only the system administrator can set file permissions"],
+    correct:2,
+    exp:"Linux permissions have three levels (owner, group, others) and three types (read, write, execute) — the rwx system. Like keys in a building: the landlord has the master key, tenants have room keys, visitors can only look through the glass."
+  },
+  {
+    q:"What is a shell in Linux?",
+    opts:["The outer casing of a Linux server","A command-line interface that lets you communicate with the operating system","A type of network firewall","A file compression tool"],
+    correct:1,
+    exp:"The shell is the interface between you and the Linux kernel. You type commands, the shell passes them to the OS, and returns results. Bash is the most common shell — think of it as the intercom system to every department."
+  },
+  {
+    q:"Which command would you use to change to a different directory in Linux?",
+    opts:["move","go","cd","nav"],
+    correct:2,
+    exp:"cd stands for change directory — it is how you move between folders in Linux. cd /home moves you to the home directory. cd .. moves you one level up."
+  },
+  {
+    q:"What does AWS stand for — and why does it matter for Linux?",
+    opts:["Advanced Web Software — it replaces Linux on modern servers","Amazon Web Services — the cloud platform where most Linux servers are deployed","Automated Workflow System — a Linux tool for scheduling tasks","African Web Standards — a regional internet framework"],
+    correct:1,
+    exp:"AWS is Amazon Web Services — the world's largest cloud platform. EC2 instances (virtual servers on AWS) run Linux. Understanding Linux is essential for working with AWS because every server you create there runs on it."
+  },
+  {
+    q:"A student accidentally deleted an important file using the rm command. What is true?",
+    opts:["The file goes to a Recycle Bin and can be restored easily","Linux automatically backs up deleted files to /backup","The rm command permanently deletes files — there is no Recycle Bin by default","The file is still accessible as a hidden file in the same directory"],
+    correct:2,
+    exp:"rm permanently deletes files in Linux — there is no Recycle Bin by default. This is why understanding Linux before using it in production is critical. One wrong rm command on a server can cause real damage."
+  },
+  {
+    q:"Which best describes the Foundation First learning path at WirfonCloud Academy?",
+    opts:["Start directly with AWS Cloud certifications — Linux is optional","Learn Cloud first, then go back to Linux if you get confused","Build Linux, Networking and Python skills first — then move to Cloud and AI","All courses can be learned simultaneously with no preferred order"],
+    correct:2,
+    exp:"Foundation First is the WirfonCloud philosophy — Linux, Networking and Python before Cloud and AI. Students who skip the foundation always struggle later. Cloud is the roof. Linux is the foundation. You cannot build a roof before the walls."
+  }
+];
+
+const tiers=[
+  {
+    min:0,max:3,
+    label:"Your Foundation Journey Starts Now",
+    badgeClass:"tier-starter",
+    intro:"You are at the perfect starting point.",
+    body:"Most people who score here have heard of Linux but have not yet worked with it — and that is completely fine. Linux Fundamentals at WirfonCloud Academy is built exactly for where you are. No prior knowledge needed. Every concept is taught using African real-world analogies — MTN MoMo, Kimironko Market, Keke Napep — so you understand before you memorise.",
+    student:"Boris Mougoue started exactly here with zero technical background. Today he is an Application Manager at a leading tech company.",
+    ytName:"Watch Boris's full story",
+    ytUrl:"https://www.youtube.com/watch?v=B1xONPqdr0s",
+    ctaHeading:"Your next step is free",
+    ctaBody:"Join the free Linux in 60 Minutes workshop. No experience needed. Taught with African real-world analogies. Monthly on Zoom.",
+    ctaBtn:"Reserve my free seat",
+    ctaUrl:"https://academy.wirfoncloud.com"
+  },
+  {
+    min:4,max:6,
+    label:"You Have Awareness — Now Build the Foundation",
+    badgeClass:"tier-building",
+    intro:"You have picked up Linux concepts along the way.",
+    body:"That awareness is valuable. But awareness is different from a solid, structured foundation. The questions you missed reveal exactly the gaps that cause confusion when you move into Cloud and DevOps later. Linux Fundamentals at WirfonCloud Academy will close those gaps systematically — module by module, with African analogies that make every concept genuinely click.",
+    student:"Emmanuel came through this stage and earned 3 certifications in the right order: LPI Linux Essentials, then AWS Cloud Practitioner, then AWS Solutions Architect Associate.",
+    ytName:"Watch Emmanuel's full story",
+    ytUrl:"https://www.youtube.com/watch?v=AOcT-db-miI",
+    ctaHeading:"Fill the gaps — start free",
+    ctaBody:"Join the free Linux in 60 Minutes workshop to experience the teaching method before enrolling in the full course.",
+    ctaBtn:"Join the free workshop",
+    ctaUrl:"https://academy.wirfoncloud.com"
+  },
+  {
+    min:7,max:8,
+    label:"Strong Awareness — Ready to Formalise",
+    badgeClass:"tier-aware",
+    intro:"You have a strong grasp of Linux fundamentals.",
+    body:"The concepts are not foreign to you — you can navigate the basics and understand the purpose of core commands. What Linux Fundamentals at WirfonCloud Academy adds at this stage: structured depth, practical hands-on labs, and the LPI Linux Essentials certification that proves your knowledge formally to employers. The certification is not just a piece of paper. It is the verified receipt that tells employers your Linux knowledge was tested.",
+    student:"Cham Zekebweliwai built on exactly this foundation and is now a Senior Infrastructure Engineer at Cancer Research UK, earning twice the UK average salary.",
+    ytName:"Watch Cham's full story",
+    ytUrl:"https://www.youtube.com/watch?v=Oqp5nzNQDSQ",
+    ctaHeading:"Formalise what you know",
+    ctaBody:"Enrol in Linux Fundamentals and earn the LPI Linux Essentials certification that proves your foundation to employers.",
+    ctaBtn:"Start Linux Fundamentals",
+    ctaUrl:"https://academy.wirfoncloud.com"
+  },
+  {
+    min:9,max:10,
+    label:"Foundation Ready — Time for Cloud",
+    badgeClass:"tier-ready",
+    intro:"Excellent. Your Linux foundation knowledge is solid.",
+    body:"You understand the operating system, the file system, permissions, the shell, and the commands that run real Linux servers. That is the foundation most Cloud students never build. Your next step is AWS Cloud Computing — taught at AWS Authorized Instructor level by Banjika Ngo, with 11 AWS certifications and enterprise experience at Verizon, IBM and Kyndryl.",
+    student:"Tatiana Kinyuy built on this foundation and became a Platform Engineer — starting from zero technical knowledge.",
+    ytName:"Watch Tatiana's full story",
+    ytUrl:"https://youtu.be/4q29nbxbADM",
+    ctaHeading:"You are ready for Cloud",
+    ctaBody:"Explore AWS Cloud Computing courses at AWS Authorized Instructor level. One instructor, one platform — from foundation to Cloud certification.",
+    ctaBtn:"Explore AWS Cloud courses",
+    ctaUrl:"https://academy.wirfoncloud.com"
+  }
+];
+
+let currentQ=0;
+let answers=Array(10).fill(null);
+let answered=Array(10).fill(false);
+
+function startQuiz(){
+  showSection('section-quiz');
+  renderQuestion();
+  document.getElementById('progress-fill').style.width='10%';
+  document.getElementById('progress-text').textContent='Question 1 of 10';
+}
+
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='section-intro'){
+    document.getElementById('main-header').style.display='block';
+    document.getElementById('score-live').style.display='none';
+  } else if(id==='section-results'){
+    document.getElementById('main-header').style.display='none';
+  }
+}
+
+function renderQuestion(){
+  const q=questions[currentQ];
+  const letters=['A','B','C','D'];
+  const isAnswered=answered[currentQ];
+
+  let html=`<div class="q-card">
+    <div class="q-number">Question ${currentQ+1} of 10</div>
+    <div class="q-text">${q.q}</div>`;
+
+  q.opts.forEach((o,i)=>{
+    let cls='option';
+    if(isAnswered){
+      if(i===q.correct) cls+=' correct';
+      else if(i===answers[currentQ]&&i!==q.correct) cls+=' wrong';
+    } else if(answers[currentQ]===i){
+      cls+=' selected';
+    }
+    html+=`<div class="${cls}" onclick="selectAnswer(${i})">
+      <div class="opt-bubble">${isAnswered?(i===q.correct?'✓':(i===answers[currentQ]?'✗':letters[i])):letters[i]}</div>
+      <div class="opt-text">${o}</div>
+    </div>`;
+  });
+
+  if(isAnswered){
+    html+=`<div class="explanation" style="display:block">${q.exp}</div>`;
+  }
+
+  html+='</div>';
+  document.getElementById('question-display').innerHTML=html;
+  document.getElementById('q-counter').textContent=`${currentQ+1} / 10`;
+  document.getElementById('progress-fill').style.width=((currentQ+1)/10*100)+'%';
+  document.getElementById('progress-text').textContent=`Question ${currentQ+1} of 10`;
+  document.getElementById('btn-prev').disabled=currentQ===0;
+
+  const nxt=document.getElementById('btn-next');
+  nxt.textContent=currentQ===9?'See my results →':'Next →';
+  nxt.disabled=false;
+
+  const scoreEl=document.getElementById('score-live');
+  const answeredCount=answers.filter(a=>a!==null).length;
+  if(answeredCount>0){
+    scoreEl.style.display='inline';
+    const correct=answers.reduce((s,a,i)=>s+(a!==null&&a===questions[i].correct?1:0),0);
+    document.getElementById('live-score').textContent=correct;
+  }
+}
+
+function selectAnswer(i){
+  if(answered[currentQ]) return;
+  answers[currentQ]=i;
+  answered[currentQ]=true;
+  renderQuestion();
+}
+
+function prevQuestion(){
+  if(currentQ>0){currentQ--;renderQuestion();}
+}
+
+function nextQuestion(){
+  if(currentQ===9){
+    showSection('section-email');
+    document.getElementById('main-header').style.display='none';
+    return;
+  }
+  currentQ++;
+  renderQuestion();
+}
+
+function showResults(){
+  const name=document.getElementById('input-name').value.trim();
+  const email=document.getElementById('input-email').value.trim();
+
+  if(!email||!email.includes('@')){
+    alert('Please enter a valid email address to see your results.');
+    return;
+  }
+
+  const score=answers.reduce((s,a,i)=>s+(a===questions[i].correct?1:0),0);
+  const tier=tiers.find(t=>score>=t.min&&score<=t.max)||tiers[0];
+
+  /* ============================================================
+     MAILERLITE INTEGRATION POINT
+     Replace the comment below with your MailerLite embedded
+     form submission or use their JavaScript API to subscribe
+     the user to your "Linux Fundamentals — Waitlist" group.
+
+     Option 1 — MailerLite universal JS snippet:
+     If you have the MailerLite universal script loaded on the page,
+     you can call their subscribe API here.
+
+     Option 2 — Use a hidden MailerLite embedded form:
+     Add a hidden MailerLite form to the page and submit it
+     programmatically with the name and email values.
+
+     Option 3 — Zapier webhook:
+     Send a POST request to a Zapier webhook that adds the
+     subscriber to MailerLite automatically.
+
+     For now, the results display without MailerLite integration.
+     See the setup instructions in linux-quiz-setup-guide.md.
+  ============================================================ */
+  console.log('Quiz completed:', {name, email, score, tier: tier.label});
+
+  showSection('section-results');
+
+  /* Results header */
+  document.getElementById('results-header-card').innerHTML=`
+    <div style="text-align:center;padding:8px 0 16px">
+      <div class="score-circle">
+        <div class="score-big">${score}</div>
+        <div class="score-denom">out of 10</div>
+      </div>
+      <span class="tier-badge ${tier.badgeClass}">${tier.label}</span>
+      <p class="result-heading">${name?'Well done, '+name+'!':'Well done!'}</p>
+      <p style="font-size:14px;color:#374151;font-weight:600;margin-bottom:10px">${tier.intro}</p>
+      <p class="result-text">${tier.body}</p>
+      <div class="student-proof">
+        <p>${tier.student}</p>
+        <a href="${tier.ytUrl}" target="_blank">${tier.ytName} →</a>
+      </div>
+    </div>`;
+
+  /* CTA block */
+  document.getElementById('cta-block').innerHTML=`
+    <div class="cta-box">
+      <h3>${tier.ctaHeading}</h3>
+      <p>${tier.ctaBody}</p>
+      <a href="${tier.ctaUrl}" class="cta-link" target="_blank">${tier.ctaBtn}</a>
+      <div class="cta-free">academy.wirfoncloud.com · WirfonCloud Academy · est. 2020</div>
+    </div>`;
+
+  /* Question review */
+  let reviewHTML='';
+  questions.forEach((q,i)=>{
+    const correct=answers[i]===q.correct;
+    reviewHTML+=`<div class="review-item">
+      <div class="review-icon ${correct?'ri-correct':'ri-wrong'}">${correct?'✓':'✗'}</div>
+      <div class="review-body">
+        <div class="rv-q">${q.q}</div>
+        <div class="rv-your">Your answer: ${answers[i]!==null?q.opts[answers[i]]:'Not answered'}</div>
+        ${!correct?`<div class="rv-correct">Correct: ${q.opts[q.correct]}</div>`:''}
+        <div class="rv-exp">${q.exp}</div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('review-list').innerHTML=reviewHTML;
+}
+
+function restartQuiz(){
+  currentQ=0;
+  answers=Array(10).fill(null);
+  answered=Array(10).fill(false);
+  document.getElementById('main-header').style.display='block';
+  document.getElementById('progress-fill').style.width='0%';
+  document.getElementById('score-live').style.display='none';
+  showSection('section-quiz');
+  renderQuestion();
+}
+</script>
+
+</body>
+</html>
