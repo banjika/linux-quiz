@@ -46,7 +46,7 @@
   .btn-primary:hover:not(:disabled){background:#0187d4;border-color:#0187d4}
   .q-counter{font-size:13px;color:#94a3b8;font-weight:500}
 
-  /* Email capture template styling overrides */
+  /* Email capture */
   .email-card{background:#fff;border-radius:16px;padding:28px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
   .email-card h2{font-size:20px;font-weight:700;color:#111;margin-bottom:8px}
   .email-card p{font-size:14px;color:#64748b;line-height:1.6;margin-bottom:22px}
@@ -124,8 +124,8 @@
       <h2>Is your baseline ready for Cloud & AI?</h2>
       <p>Find out if you have the core fundamental knowledge required to launch a high-paying career in Cloud Engineering or Devops architecture.</p>
       <ul class="intro-list">
-        <li>7 targeted architectural readiness questions</li>
-        <li>Takes less than 3 minutes to complete</li>
+        <li>10 targeted architectural readiness questions</li>
+        <li>Takes less than 4 minutes to complete</li>
         <li>Instant practical analysis & localized skill roadmap</li>
       </ul>
       <button class="start-btn" onclick="startQuiz()">Start Assessment</button>
@@ -140,7 +140,7 @@
         <div id="progress-bar" class="progress-fill" style="width: 0%;"></div>
       </div>
       <div class="progress-label">
-        <span id="progress-text">Question 1 of 7</span>
+        <span id="progress-text">Question 1 of 10</span>
         <span id="pct-text">0% Complete</span>
       </div>
     </div>
@@ -153,7 +153,7 @@
     </div>
 
     <div class="nav-row">
-      <span class="q-counter" id="footer-counter">1 / 7</span>
+      <span class="q-counter" id="footer-counter">1 / 10</span>
       <button id="next-btn" class="btn btn-primary" disabled onclick="handleNext()">Next Question</button>
     </div>
   </div>
